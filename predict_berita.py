@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import PCA
 
 # Tambahkan path stopwords manual
-stopwords_path = 'nltk_data/corpora/stopwords'
+stopwords_path = 'nltk_data/corpora'
 if os.path.exists(stopwords_path):
     nltk.data.path.append(stopwords_path)
 
