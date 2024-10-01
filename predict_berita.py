@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import re
+import nltk
 from nltk.corpus import stopwords
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from sklearn.feature_extraction.text import TfidfVectorizer
