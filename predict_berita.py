@@ -18,7 +18,7 @@ except LookupError:
     nltk.download('stopwords')
     stop_words = stopwords.words('indonesian')
 
-# Inisialisasi Stemmer Bahasa Indonesia
+# Inisialisasi NLTK Stopwords dan Stemmer Bahasa Indonesia
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
@@ -30,15 +30,15 @@ def preprocess(input_text):
         return url.sub(r'', news)
 
     def remove_html(news):
-        html = re.compile(r'<.*?>')
+        html = re.compile(r'<.#?>')
         return html.sub(r'', news)
 
     def remove_emoji(news):
         emoji_pattern = re.compile("[" 
-            u"\U0001F600-\U0001F64F"  # emotikon
-            u"\U0001F300-\U0001F5FF"  # simbol dan gambar
-            u"\U0001F680-\U0001F6FF"  # transportasi dan simbol lainnya
-            u"\U0001F1E0-\U0001F1FF"  # bendera
+            u"\U0001F600-\U0001F64F"  
+            u"\U0001F300-\U0001F5FF"  
+            u"\U0001F680-\U0001F6FF"  
+            u"\U0001F1E0-\U0001F1FF"  
         "]+", flags=re.UNICODE)
         return emoji_pattern.sub(r'', news)
 
@@ -55,7 +55,7 @@ def preprocess(input_text):
         return text.split()
 
     def remove_stopwords(tokens):
-        # Menggunakan stopwords yang telah diunduh atau dipastikan ada
+        stop_words = stopwords.words('indonesian')
         return [word for word in tokens if word not in stop_words]
 
     def stem_text(tokens):
@@ -84,7 +84,7 @@ try:
     with open('tfidf_vectorizer.pkl', 'rb') as tfidf_file:
         tfidf_vect = pickle.load(tfidf_file)
 except FileNotFoundError:
-    st.write("TF-IDF Vectorizer tidak ditemukan. Melakukan fitting...")
+    # st.write("TF-IDF Vectorizer tidak ditemukan. Melakukan fitting...")
     
     # Load dataset untuk fitting
     data = pd.read_csv("C:/KULIAH/PPW/berita_cleaned.csv")  # Ganti dengan lokasi file yang sesuai
@@ -103,14 +103,11 @@ except FileNotFoundError:
         pickle.dump(tfidf_vect, f)
 
 # Load model PCA dan Logistic Regression
-try:
-    with open('pca_model.pkl', 'rb') as pca_file:
-        pca_model = pickle.load(pca_file)
+with open('pca_model.pkl', 'rb') as pca_file:
+    pca_model = pickle.load(pca_file)
 
-    with open('logreg_pca_model.pkl', 'rb') as model_file:
-        logreg_pca_model = pickle.load(model_file)
-except FileNotFoundError:
-    st.error("Model PCA atau Logistic Regression tidak ditemukan.")
+with open('logreg_pca_model.pkl', 'rb') as model_file:
+    logreg_pca_model = pickle.load(model_file)
 
 # Input Data Baru dari Pengguna
 new_input = st.text_input("Masukkan teks berita baru:")
