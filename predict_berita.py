@@ -11,15 +11,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import PCA
 import os
 
-# Tambahkan path stopwords manual
-stopwords_path = 'nltk_data/corpora'
-if os.path.exists(stopwords_path):
-    nltk.data.path.append(stopwords_path)
+# Cek dan unduh stopwords jika belum ada
+try:
+    stop_words = stopwords.words('indonesian')
+except LookupError:
+    nltk.download('stopwords')
+    stop_words = stopwords.words('indonesian')
 
-# Load stopwords tanpa unduhan dinamis
-stop_words = stopwords.words('indonesian')
-
-# Inisialisasi NLTK Stopwords dan Stemmer Bahasa Indonesia
+# Inisialisasi Stemmer Bahasa Indonesia
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
@@ -31,15 +30,15 @@ def preprocess(input_text):
         return url.sub(r'', news)
 
     def remove_html(news):
-        html = re.compile(r'<.#?>')
+        html = re.compile(r'<.*?>')
         return html.sub(r'', news)
 
     def remove_emoji(news):
         emoji_pattern = re.compile("[" 
-            u"\U0001F600-\U0001F64F"  
-            u"\U0001F300-\U0001F5FF"  
-            u"\U0001F680-\U0001F6FF"  
-            u"\U0001F1E0-\U0001F1FF"  
+            u"\U0001F600-\U0001F64F"  # emotikon
+            u"\U0001F300-\U0001F5FF"  # simbol dan gambar
+            u"\U0001F680-\U0001F6FF"  # transportasi dan simbol lainnya
+            u"\U0001F1E0-\U0001F1FF"  # bendera
         "]+", flags=re.UNICODE)
         return emoji_pattern.sub(r'', news)
 
@@ -56,7 +55,7 @@ def preprocess(input_text):
         return text.split()
 
     def remove_stopwords(tokens):
-        stop_words = stopwords.words('indonesian')
+        # Menggunakan stopwords yang telah diunduh atau dipastikan ada
         return [word for word in tokens if word not in stop_words]
 
     def stem_text(tokens):
@@ -85,7 +84,7 @@ try:
     with open('tfidf_vectorizer.pkl', 'rb') as tfidf_file:
         tfidf_vect = pickle.load(tfidf_file)
 except FileNotFoundError:
-    # st.write("TF-IDF Vectorizer tidak ditemukan. Melakukan fitting...")
+    st.write("TF-IDF Vectorizer tidak ditemukan. Melakukan fitting...")
     
     # Load dataset untuk fitting
     data = pd.read_csv("C:/KULIAH/PPW/berita_cleaned.csv")  # Ganti dengan lokasi file yang sesuai
@@ -104,11 +103,14 @@ except FileNotFoundError:
         pickle.dump(tfidf_vect, f)
 
 # Load model PCA dan Logistic Regression
-with open('pca_model.pkl', 'rb') as pca_file:
-    pca_model = pickle.load(pca_file)
+try:
+    with open('pca_model.pkl', 'rb') as pca_file:
+        pca_model = pickle.load(pca_file)
 
-with open('logreg_pca_model.pkl', 'rb') as model_file:
-    logreg_pca_model = pickle.load(model_file)
+    with open('logreg_pca_model.pkl', 'rb') as model_file:
+        logreg_pca_model = pickle.load(model_file)
+except FileNotFoundError:
+    st.error("Model PCA atau Logistic Regression tidak ditemukan.")
 
 # Input Data Baru dari Pengguna
 new_input = st.text_input("Masukkan teks berita baru:")
