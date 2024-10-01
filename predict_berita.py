@@ -10,7 +10,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import PCA
 
 # Menambahkan path untuk folder nltk_data lokal
-nltk.data.path.append('nltk_data/corpora/indonesian')
+# nltk.data.path.append('nltk_data/corpora/indonesian')
+# Unduh stopwords
+nltk.download('stopwords')
 
 # Inisialisasi NLTK Stopwords dan Stemmer Bahasa Indonesia
 factory = StemmerFactory()
